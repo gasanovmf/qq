@@ -4,6 +4,7 @@ from quad import getNewState
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+from pid import PID
 
 w1 = 3
 w2 = 1.9475
@@ -34,13 +35,20 @@ state = {
 
 i = 0
 
-while i < 2000:
+y_d = 1
+ws = []
+
+while i < 20000:
     state = getNewState(state, W)
+
+    w1 = PID(y_d - state["y"])
+    W = [w1, w1, w1, w1]
+
+    # -- save --
+    ws.append(w1)
     z.append(state["z"])
     y.append(state["y"])
     x.append(state["x"])
-    if y[-1] > 1:
-        W = [w2, w2, w2, w2]
 
     gamma.append(state["gamma"])
     psi.append(state["psi"])
@@ -55,6 +63,7 @@ while i < 2000:
 # plt.show()
 
 plt.plot(y)
+# plt.plot(ws)
 # plt.plot(np.array(gamma))
 # plt.plot(np.array(psi))
 # plt.plot(np.array(nu))

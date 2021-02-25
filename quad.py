@@ -3,6 +3,12 @@ import numpy as np
 from serve import getFullP, getP
 from math import cos, sin, tan
 
+def getDirection(v):
+    ret = 1
+    if v < 0:
+        ret = -1
+    return ret
+
 def getNewState(state, W):
     w1 = W[0] + W[2] - W[1] - W[3]
     w2 = W[1] + W[3] - W[0] - W[2]
@@ -22,9 +28,9 @@ def getNewState(state, W):
 
     P = getFullP(W)
     A = {}
-    A["ax"] =  P*((-1)*cos(state["gamma"])*cos(state["psi"])*sin(state["nu"]) - sin(state["gamma"])*sin(state["psi"]))/m
-    A["ay"] = (P*cos(state["gamma"])*cos(state["nu"]) - m*g)/m
-    A["az"] =  P*((-1)*cos(state["gamma"])*sin(state["psi"])*sin(state["nu"]) - sin(state["gamma"])*cos(state["psi"]))/m
+    A["ax"] =  ( P*((-1)*cos(state["gamma"])*cos(state["psi"])*sin(state["nu"]) + sin(state["gamma"])*sin(state["psi"])) - getDirection(state["vx"]) *apha*state["vx"]**2 )/m
+    A["ay"] = (P*cos(state["gamma"])*cos(state["nu"]) - m*g -  getDirection(state["vy"])*apha*state["vy"]**2)/m
+    A["az"] =  ( P*(cos(state["gamma"])*sin(state["psi"])*sin(state["nu"]) + sin(state["gamma"])*cos(state["psi"])) -  getDirection(state["vz"])*apha*state["vz"]**2)/m
     A["wx_dot"] = Iyzx*state["wy"]*state["wz"] + MRx/Ix
     A["wy_dot"] = Izxy*state["wx"]*state["wz"] + MRy/Iy
     A["wz_dot"] = Ixyz*state["wx"]*state["wy"] + MRz/Iz
