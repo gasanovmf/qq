@@ -38,10 +38,12 @@ i = 0
 y_d = 1
 ws = []
 
+pid1 = PID(0.7, 1.5, 30000)
+
 while i < 20000:
     state = getNewState(state, W)
 
-    w1 = PID(y_d - state["y"])
+    w1 = pid1.compute(y_d - state["y"])
     W = [w1, w1, w1, w1]
 
     # -- save --
