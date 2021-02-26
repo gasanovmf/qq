@@ -7,8 +7,12 @@ class PID():
         self.kd = kd
         self.I = 0
         self.values = [0]
-        self.max_ret = 10
-        self.min_ret = 0
+        self.lim_max = 10
+        self.lim_min = 0
+
+    def setLimits(self, lim_min, lim_max):
+        self.lim_max = lim_max
+        self.lim_min = lim_min
 
     def compute(self, err):
         self.I += err
@@ -17,8 +21,8 @@ class PID():
             self.I -= self.values[0]
             self.values = self.values[1:]
         ret = self.kp*err + self.kd*(self.values[-1] - self.values[-2]) + self.ki*self.I
-        if ret > self.max_ret:
-            ret = self.max_ret
-        if ret < self.min_ret:
-            ret = self.min_ret
+        if ret > self.lim_max:
+            ret = self.lim_max
+        if ret < self.lim_min:
+            ret = self.lim_min
         return ret
