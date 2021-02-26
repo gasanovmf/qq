@@ -1,10 +1,12 @@
-path = []
 
-def put(value):
-    global path
-    path.append(value)
+class Saver:
+
+    def __init__(self):
+        self.path = []
+
+    def put(self, value):
+        self.path.append(value)
 
 
-def getPath(field):
-    global path
-    return list(map(lambda el: el[field], path))
+    def getPath(self, field):
+        return list(map(lambda el: el[field], self.path))
