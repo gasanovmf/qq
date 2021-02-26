@@ -41,14 +41,18 @@ collecter1 = []
 
 saver = Saver()
 
+# -- PIDS --
 pid_dy = PID(0.7, 1.5, 30000)
 pid_dx = PID(0.7, 1.5, 30000)
 pid_dz = PID(0.7, 1.5, 30000)
+pid_gamma = PID(0.7, 1.5, 30000)
+pid_nu = PID(0.7, 1.5, 30000)
+pid_psi = PID(0.7, 1.5, 30000)
 
 while i < 2000:
     state = getNewState(state, motors)
 
-    Uy = pid_dy.compute(state_d["y"] - state["y"])
+    U1 = pid_dy.compute(state_d["y"] - state["y"])
 
     P = sv.getFullP(motors)
 
@@ -60,12 +64,16 @@ while i < 2000:
     if P != 0:
         state_d["gamma"] = asin((Uz*cos(state_d["psi"]) + Ux*sin(state_d["psi"])) / P)
         state_d["nu"] = asin((Uz*sin(state_d["psi"]) + Ux*cos(state_d["psi"])) / P)
+
+    U2 = pid_gamma.compute(state_d["gamma"] - state["gamma"])
+    U3 = pid_nu.compute(state_d["nu"] - state["nu"])
+    U4 = pid_psi.compute(state_d["psi"] - state["psi"])
     
-    collecter1.append(state_d["nu"])
+    collecter1.append(U3)
 
     saver.put(state)
 
-    motors = [Uy, Uy, Uy, Uy]
+    motors = [U1, U1, U1, U1]
 
     i += 1
 
