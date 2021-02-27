@@ -23,6 +23,9 @@ Ip = 1
 
 l = 1
 
+b = 1
+d = 1
+
 Iyzx = (Iy - Iz) / Ix
 Izxy = (Iz - Ix) / Iy
 Ixyz = (Ix - Iy) / Iz
