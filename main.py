@@ -2,6 +2,8 @@ import serve as sv
 import params
 from quad import getNewState
 from pid import PID
+from physics import world_physics
+
 from save import Saver
 
 from math import sin, cos, acos, asin
@@ -30,7 +32,7 @@ i = 0
 
 state_d = {
     "x": 0,
-    "y": 0,
+    "y": 1,
     "z": 0,
     "gamma": 0,
     "psi": 0,
@@ -55,7 +57,7 @@ pid_nu = PID(0.7, 1.5, 30000)
 pid_psi = PID(0.7, 1.5, 30000)
 
 while i < 2000:
-    state = getNewState(state, motors)
+    state = world_physics(getNewState(state, motors))
 
     U1 = pid_dy.compute(state_d["y"] - state["y"])
 
@@ -74,7 +76,7 @@ while i < 2000:
     U3 = pid_nu.compute(state_d["nu"] - state["nu"])
     U4 = pid_psi.compute(state_d["psi"] - state["psi"])
     
-    collecter1.append(U1)
+    collecter1.append(state["y"])
     collecter2.append(U2)
     collecter3.append(U3)
     collecter4.append(U4)
@@ -83,7 +85,7 @@ while i < 2000:
 
     motors = [U1 + U2 + U4, U1 + U3 - U4, U1 - U2 + U4, U1 - U2 + U4]
 
-    print(U1, U2, U3, U4)
+    # print(U1, U2, U3, U4)
 
     i += 1
 
