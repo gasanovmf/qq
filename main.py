@@ -31,10 +31,10 @@ state = {
 i = 0
 
 state_d = {
-    "x": 0,
-    "y": 1,
+    "x": 1,
+    "y": 10,
     "z": 0,
-    "gamma": 0.5,
+    "gamma": 0,
     "psi": 0,
     "nu": 0
 }
@@ -48,62 +48,77 @@ saver = Saver()
 
 # -- PIDS --
 pid_dy = PID(0.7, 1.5, 30000)
-pid_dx = PID(0.7, 1.5, 30000)
+
+kp_x = 0.4
+Tx = 30000
+pid_dx = PID(kp_x, 2*kp_x/Tx, kp_x*Tx/2.5)
+
 pid_dz = PID(0.7, 1.5, 30000)
-pid_gamma = PID(1, 0.5, 30)
-pid_gamma.setLimits(-1.5, 1.5)
-pid_nu = PID(0.7, 1.5, 30000)
-# pid_nu.setLimits(-1.5, 1.5)
+
+pid_gamma = PID(1, 0.5, 3000)
+pid_gamma.setLimits(-1, 1)
+
+kp_nu = 3
+Tnu = 7000
+pid_nu = PID(kp_nu, 0.1*kp_nu/Tnu, kp_nu*Tnu/4)
+pid_nu.setLimits(-1, 1)
+
 pid_psi = PID(0.7, 1.5, 30000)
 
-while i < 2000:
+while i < 1000:
     state = world_physics(getNewState(state, motors))
 
-    U1 = pid_dy.compute(state_d["y"] - state["y"])
+    U1 = round(pid_dy.compute(state_d["y"] - state["y"]), 2)
 
     P = sv.getFullP(motors)
 
     pid_dx.setLimits((-1)*P, P)
-    Ux = pid_dx.compute(state_d["x"] - state["x"])
+    Ux = (-1)*pid_dx.compute(state_d["x"] - state["x"])
     pid_dz.setLimits((-1)*P, P)
-    Uz = pid_dz.compute(state_d["z"] - state["z"])
+    Uz = (-1)*pid_dz.compute(state_d["z"] - state["z"])
 
-    # if P != 0:
-    #     state_d["nu"] = asin((Uz*cos(state_d["psi"]) + Ux*sin(state_d["psi"])) / P)
-    #     state_d["gamma"] = asin((Uz*sin(state_d["psi"]) + Ux*cos(state_d["psi"])) / P)
+    if P != 0:
+        state_d["gamma"] = np.clip(asin((Uz*cos(state_d["psi"]) + Ux*sin(state_d["psi"])) / P), -1, 1)
+        state_d["nu"] = np.clip(asin((Uz*sin(state_d["psi"]) + Ux*cos(state_d["psi"])) / P), -1, 1)
 
-    U2 = pid_gamma.compute(state_d["gamma"] - state["gamma"])
-    U3 = pid_nu.compute(state_d["nu"] - state["nu"])
-    U4 = pid_psi.compute(state_d["psi"] - state["psi"])
+    K = 0.5
+
+    U2 = round(pid_gamma.compute(state_d["gamma"] - state["gamma"]), 2)*U1*0.5
+    U3 = round(pid_nu.compute(state_d["nu"] - state["nu"]), 2)*U1*0.5
+    U4 = round(pid_psi.compute(state_d["psi"] - state["psi"]), 2)*U1*0.5
     
     saver.put(state)
 
-    U1 = 10
+    # U1 = 10
 
-    motors = [U1 + U2 + U4, U1 + U3 - U4, U1 - U2 + U4, U1 - U2 - U4]
+    motors = [round(U1 + U2 + U4, 2), round(U1 + U3 - U4, 2), round(U1 - U2 + U4, 2), round(U1 - U3 - U4, 2)]
 
-    collecter1.append(U1)
-    collecter2.append(U2)
+    collecter1.append(U3)
+    collecter2.append(Ux)
     collecter3.append(U3)
     collecter4.append(U4)
 
 
-    print(U1, U2, U3, U4)
-
-    input()
+    # print("N____________________________", i)
+    # print(motors)
+    # print(state)
+    # print(U1, U2, U3, U4)
+    # print(Ux, Uz)
+    # input()
+    
 
     i += 1
 
 
-#-- plot -- 
 fig = plt.figure()
 ax = Axes3D(fig)
 ax.scatter(saver.getPath("x") , saver.getPath("z"), saver.getPath("y"))
 plt.show()
 
-# plt.plot(saver.getPath("gamma"))
-plt.plot(collecter1)
-plt.plot(collecter2)
-plt.plot(collecter3)
-plt.plot(collecter4)
+# plt.plot(saver.getPath("nu"))
+# plt.plot(saver.getPath("x"))
+# plt.plot(collecter1)
+# plt.plot(collecter2)
+# plt.plot(collecter3)
+# plt.plot(collecter4)
 plt.show()

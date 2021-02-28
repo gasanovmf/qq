@@ -10,8 +10,8 @@ def getDirection(v):
     return ret
 
 def getNewState(state, W):
-    w1 = W[0] + W[2] - W[1] - W[3]
-    w2 = W[1] + W[3] - W[0] - W[2]
+    w1 = round(W[0] + W[2] - W[1] - W[3], 3)
+    w2 = round(W[1] + W[3] - W[0] - W[2], 3)
 
     Mmx = Im*state["wz"]*w1
     Mmz = Im*state["wx"]*w2
@@ -22,6 +22,19 @@ def getNewState(state, W):
     Mqz = (getP(W[1]) - getP(W[3]))*l
     Mqy = getP(W[1]) + getP(W[3]) - getP(W[0]) - getP(W[2])
 
+    if abs(W[1] + W[3] - W[0] - W[2]) <= 0.1:
+        Mqy = 0
+        Mmx = 0
+        Mmz = 0
+        Mpx = 0
+        Mpz = 0
+
+    if abs(W[0] - W[2]) <= 0.1:
+        Mqx = 0
+
+    if abs(W[1] - W[3]) <= 0.1:
+        Mqz = 0
+
     MRx = Mqx + Mmx + Mpx
     MRy = Mqy
     MRz = Mqz + Mmz + Mpz
@@ -30,13 +43,22 @@ def getNewState(state, W):
     A = {}
     A["ax"] =  ( P*((-1)*cos(state["gamma"])*cos(state["psi"])*sin(state["nu"]) + sin(state["gamma"])*sin(state["psi"])) - getDirection(state["vx"]) *apha*state["vx"]**2 )/m
     A["ay"] = (P*cos(state["gamma"])*cos(state["nu"]) - m*g -  getDirection(state["vy"])*apha*state["vy"]**2)/m
-    A["az"] =  ( P*(cos(state["gamma"])*sin(state["psi"])*sin(state["nu"]) + sin(state["gamma"])*cos(state["psi"])) -  getDirection(state["vz"])*apha*state["vz"]**2)/m
+    A["az"] =  ( P*(cos(state["gamma"])*sin(state["psi"])*sin(state["nu"]) + sin(state["gamma"])*sin(state["psi"])) -  getDirection(state["vz"])*apha*state["vz"]**2)/m
     A["wx_dot"] = Iyzx*state["wy"]*state["wz"] + MRx/Ix
     A["wy_dot"] = Izxy*state["wx"]*state["wz"] + MRy/Iy
     A["wz_dot"] = Ixyz*state["wx"]*state["wy"] + MRz/Iz
+
     A["gamma_dot"] = state["wx"]*cos(state["nu"]) - state["wy"]*sin(state["nu"])
     A["psi_dot"] = (state["wx"]*sin(state["nu"] - state["wy"]*cos(state["nu"]))) / cos(state["gamma"])
-    A["nu_dot"] = state["wz"] + cos(state["nu"])*tan(state["gamma"])*state["wx"] + cos(state["nu"])*tan(state["gamma"])*state["wy"]
+    A["nu_dot"] = state["wz"] + sin(state["nu"])*tan(state["gamma"])*state["wx"] + cos(state["nu"])*tan(state["gamma"])*state["wy"]
+
+    # print("A ============================>", A)
+    # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n")
+    # print( Iyzx*state["wy"]*state["wz"], MRx/Ix)
+
+    # print(Mqy, Mqx, Mqz)
+    # print(Mmx, Mmz, Mpx, Mpz)
+    # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n")
 
     return integrator(state, A)
 
