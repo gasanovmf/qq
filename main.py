@@ -31,9 +31,9 @@ state = {
 i = 0
 
 state_d = {
-    "x": 1,
+    "x": 0,
     "y": 10,
-    "z": 0,
+    "z": 1,
     "gamma": 0,
     "psi": 0,
     "nu": 0
@@ -52,14 +52,14 @@ pid_dy = PID(0.7, 1.5, 30000)
 kp_x = 0.4
 Tx = 30000
 pid_dx = PID(kp_x, 2*kp_x/Tx, kp_x*Tx/2.5)
-
-pid_dz = PID(0.7, 1.5, 30000)
-
-pid_gamma = PID(1, 0.5, 3000)
-pid_gamma.setLimits(-1, 1)
+pid_dz = PID(kp_x, 2*kp_x/Tx, kp_x*Tx/2.5)
 
 kp_nu = 3
 Tnu = 7000
+
+pid_gamma = PID(kp_nu, 0.1*kp_nu/Tnu, kp_nu*Tnu/4)
+pid_gamma.setLimits(-1, 1)
+
 pid_nu = PID(kp_nu, 0.1*kp_nu/Tnu, kp_nu*Tnu/4)
 pid_nu.setLimits(-1, 1)
 
@@ -89,11 +89,9 @@ while i < 1000:
     
     saver.put(state)
 
-    # U1 = 10
-
     motors = [round(U1 + U2 + U4, 2), round(U1 + U3 - U4, 2), round(U1 - U2 + U4, 2), round(U1 - U3 - U4, 2)]
 
-    collecter1.append(U3)
+    collecter1.append(state_d["gamma"])
     collecter2.append(Ux)
     collecter3.append(U3)
     collecter4.append(U4)
@@ -110,14 +108,14 @@ while i < 1000:
     i += 1
 
 
-fig = plt.figure()
-ax = Axes3D(fig)
-ax.scatter(saver.getPath("x") , saver.getPath("z"), saver.getPath("y"))
-plt.show()
+# fig = plt.figure()
+# ax = Axes3D(fig)
+# ax.scatter(saver.getPath("x") , saver.getPath("z"), saver.getPath("y"))
+# plt.show()
 
-# plt.plot(saver.getPath("nu"))
-# plt.plot(saver.getPath("x"))
-# plt.plot(collecter1)
+plt.plot(saver.getPath("gamma"))
+plt.plot(saver.getPath("z"))
+plt.plot(collecter1)
 # plt.plot(collecter2)
 # plt.plot(collecter3)
 # plt.plot(collecter4)
