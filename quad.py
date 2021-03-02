@@ -3,6 +3,8 @@ import numpy as np
 from serve import getFullP, getP
 from math import cos, sin, tan
 
+import logger as lgg
+
 def getDirection(v):
     ret = 1
     if v < 0:
@@ -52,12 +54,12 @@ def getNewState(state, W):
     A["psi_dot"] = (state["wx"]*sin(state["nu"] - state["wy"]*cos(state["nu"]))) / cos(state["gamma"])
     A["nu_dot"] = state["wz"] + sin(state["nu"])*tan(state["gamma"])*state["wx"] + cos(state["nu"])*tan(state["gamma"])*state["wy"]
 
-    # print("A ============================>", A)
-    # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n")
-    # print( (-1)*cos(state["gamma"])*cos(state["psi"])*sin(state["nu"]) + sin(state["gamma"])*sin(state["psi"]) )
-    # print(Mqy, Mqx, Mqz)
-    # print(Mmx, Mmz, Mpx, Mpz)
-    # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n")
+    lgg._print("A ============================>", A)
+    lgg._print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    lgg._print(Iyzx*state["wy"]*state["wz"], MRx/Ix)
+    lgg._print(Mqy, Mqx, Mqz)
+    lgg._print(Mmx, Mmz, Mpx, Mpz)
+    lgg._print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
     return integrator(state, A)
 
