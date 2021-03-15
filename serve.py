@@ -1,4 +1,7 @@
 import params
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 def getP(w):
     return params.ci*w**2
@@ -27,3 +30,18 @@ def getW(U):
     B = U
     x = LA.solve(A, B)
     return x    
+
+
+def log_func(n):
+    K = 1
+    r = 0.01
+    P = 1
+    a = 500
+    x = np.linspace(0, n, n) 
+    y = K*P*np.exp(r*(x - a))/(K + P*(np.exp(r*(x - a)) + 1))
+    return [x, y]
+
+if __name__ == "__main__":
+    x, y = log_func(5000)
+    plt.plot(x, y) 
+    plt.show()
