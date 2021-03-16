@@ -17,7 +17,7 @@ import numpy as np
 to_state = {
     "x": 0,
     "y": 10,
-    "z": 1,
+    "z": 0,
     "gamma": 0,
     "psi": 0,
     "nu": 0
@@ -26,6 +26,15 @@ to_state = {
 
 
 def startSim(max_iter, state_d, pid_ks):
+
+    ii = 0
+    arr = [0]*15
+
+    if len(pid_ks) == 3:
+        arr[ii] = pid_ks[0]
+        arr[ii + 1] = pid_ks[1]
+        arr[ii + 2] = pid_ks[2]
+        pid_ks = arr
 
     k = np.reshape(np.array(pid_ks), (5, 3))
 
@@ -51,6 +60,9 @@ def startSim(max_iter, state_d, pid_ks):
     }
 
     motors = [0, 0, 0, 0]
+
+    # print(k)
+
     i = 0
 
     # -- PIDS --
@@ -108,7 +120,7 @@ def startSim(max_iter, state_d, pid_ks):
 
 
 if __name__ == "__main__":
-    data = startSim(10000, to_state, [58.14919498, 16.72291561, 88.92023391, 11.81453715, 40.40559305, 70.94912648, 40.80461767, 78.91156386, 59.09436955, 85.061173, 21.5327818, 67.20910472, 35.79936503, 15.60752764, 23.84163448])
+    data = startSim(10000, to_state, [487.09752636,  -3.95252192, 780.07822356])
 
     # fig = plt.figure()
     # ax = Axes3D(fig)
@@ -117,8 +129,8 @@ if __name__ == "__main__":
 
     # plt.plot(saver.getPath("x"), saver.getPath("z"))
     # plt.plot(saver.getPath("y"))
-    plt.plot(data[0].getPath("gamma"))
-    plt.plot(data[0].getPath("z"))
+    # plt.plot(data[0].getPath("gamma"))
+    plt.plot(data[0].getPath("y"))
     # plt.plot(collecter1)
     # plt.plot(collecter2)
     # plt.plot(collecter3)

@@ -51,7 +51,8 @@ class Swarm_X2 (Swarm):
         y = numpy.array(state[0].getPath("y"))
         z = numpy.array(state[0].getPath("z"))
 
-        ret = numpy.absolute(numpy.sum(x-x_i)) + numpy.absolute(numpy.sum(y-y_i)) + numpy.absolute(numpy.sum(z-z_i)) 
+        # ret = numpy.absolute(numpy.sum(x-x_i)) + numpy.absolute(numpy.sum(y-y_i)) + numpy.absolute(numpy.sum(z-z_i))
+        ret = numpy.sum(numpy.absolute(y-y_i))
 
         print("--> p_N", i)
         i += 1
@@ -60,10 +61,10 @@ class Swarm_X2 (Swarm):
         return ret
 
 iterCount = 300
-dimension = 15
-swarmsize = 200
+dimension = 3
+swarmsize = 100
 minvalues = numpy.array ([0] * dimension)
-maxvalues = numpy.array ([100] * dimension)
+maxvalues = numpy.array ([1000] * dimension)
 currentVelocityRatio = 0.1
 localVelocityRatio = 1.0
 globalVelocityRatio = 5.0
